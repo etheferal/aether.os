@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherOS | Prosedürel Odak, Ses Sentezi & Görev İstasyonu</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Arka Plan Atmosfer Işıkları -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <div class="os-container">
+    <!-- Üst Sistem Barı -->
+    <header class="os-topbar">
+      <div class="brand-cluster">
+        <div class="os-logo">Æ</div>
+        <div>
+          <h1>AetherOS <span class="version-badge">v2.4 CORE</span></h1>
+          <p class="sys-sub">Prosedürel Ses Sentezi & Geliştirici Telemetri İstasyonu</p>
+        </div>
+      </div>
+
+      <div class="sys-metrics">
+        <div class="metric-pill">
+          <span class="pulse-dot"></span>
+          <span id="sys-clock">00:00:00</span>
+        </div>
+        <div class="metric-pill">
+          <span>🔥 Seri: <strong id="streak-count">1</strong> Gün</span>
+        </div>
+        <button id="cmd-trigger" class="cmd-btn" title="Komut Paletini Aç">
+          <span>⌘ Komutlar</span>
+          <kbd>Ctrl + K</kbd>
+        </button>
+      </div>
+    </header>
+
+    <!-- Ana Bento Grid -->
+    <main class="bento-grid">
+      
+      <!-- MODÜL 1: Dinamik SVG Pomodoro & Oturum Sayacı -->
+      <section class="bento-card timer-module">
+        <div class="card-header">
+          <h2>⏱️ Krono-Odak Motoru</h2>
+          <div class="mode-tabs">
+            <button class="mode-btn active" data-mode="focus" data-time="25">Derin Odak (25d)</button>
+            <button class="mode-btn" data-mode="short" data-time="5">Kısa Mola (5d)</button>
+            <button class="mode-btn" data-mode="long" data-time="15">Uzun Mola (15d)</button>
+          </div>
+        </div>
+
+        <div class="timer-stage">
+          <div class="svg-ring-wrap">
+            <svg class="progress-ring" width="210" height="210">
+              <circle class="ring-bg" cx="105" cy="105" r="90"></circle>
+              <circle id="ring-fill" class="ring-fill" cx="105" cy="105" r="90"></circle>
+            </svg>
+            <div class="timer-readout">
+              <span id="timer-display">25:00</span>
+              <span id="timer-state-label" class="state-tag">HAZIR</span>
+            </div>
+          </div>
+
+          <div class="timer-controls">
+            <button id="timer-toggle" class="btn primary-glow">▶ Başlat (Space)</button>
+            <button id="timer-reset" class="btn ghost">↺ Sıfırla</button>
+          </div>
+
+          <div class="session-stats">
+            <div class="stat-box">
+              <span class="stat-val" id="stat-pomodoros">0</span>
+              <span class="stat-lbl">Tamamlanan Oturum</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-val" id="stat-minutes">0</span>
+              <span class="stat-lbl">Odak Dakikası</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODÜL 2: Web Audio API Prosedürel Ses Sentezleyici & FFT Spektrum -->
+      <section class="bento-card audio-module">
+        <div class="card-header">
+          <h2>🎛️ WebAudio Frekans Sentezleyici</h2>
+          <button id="audio-master-btn" class="btn audio-toggle">🔇 Sentezleyiciyi Başlat</button>
+        </div>
+
+        <p class="module-desc">Harici ses dosyası kullanmadan, gerçek zamanlı matematiksel ses tamponları (AudioBuffer) ve FFT spektrum analizi üretir.</p>
+
+        <!-- Canlı 60FPS Frekans Spektrum Ekranı -->
+        <div class="visualizer-wrap">
+          <canvas id="audio-canvas" width="500" height="90"></canvas>
+          <div class="freq-overlay" id="freq-status">DSP MOTORU BEKLEMEDE</div>
+        </div>
+
+        <!-- Kanal Mikseri -->
+        <div class="mixer-channels">
+          <div class="channel">
+            <div class="ch-info">
+              <span>🌧️ Pembe Gürültü (Akustik Yağmur Filtresi - 800Hz Lowpass)</span>
+              <span id="val-rain" class="mono-val">40%</span>
+            </div>
+            <input type="range" id="vol-rain" min="0" max="100" value="40" class="synth-slider">
+          </div>
+
+          <div class="channel">
+            <div class="ch-info">
+              <span>🌌 Kahverengi Gürültü (Derin Uzay Kabini - 180Hz Sub)</span>
+              <span id="val-deep" class="mono-val">30%</span>
+            </div>
+            <input type="range" id="vol-deep" min="0" max="100" value="30" class="synth-slider">
+          </div>
+
+          <div class="channel">
+            <div class="ch-info">
+              <span>🧠 Binaural Alfa Dalgaları (432Hz Sol / 440Hz Sağ - 8Hz Alfa)</span>
+              <span id="val-binaural" class="mono-val">15%</span>
+            </div>
+            <input type="range" id="vol-binaural" min="0" max="100" value="15" class="synth-slider">
+          </div>
+        </div>
+      </section>
+
+      <!-- MODÜL 3: Sürükle-Bırak (Drag & Drop) Kanban Görev Motoru -->
+      <section class="bento-card kanban-module">
+        <div class="card-header">
+          <h2>📋 Sürükle & Bırak Görev Matrisi (Kanban)</h2>
+          <form id="task-form" class="task-form">
+            <input type="text" id="task-input" placeholder="Yeni geliştirme görevi ekle..." required maxlength="60">
+            <select id="task-tag">
+              <option value="Mimari">⚙️ Mimari</option>
+              <option value="Frontend">🎨 Frontend</option>
+              <option value="Algoritma">🧠 Algoritma</option>
+              <option value="Test">🧪 Test</option>
+            </select>
+            <button type="submit" class="btn primary-glow">+ Ekle</button>
+          </form>
+        </div>
+
+        <div class="kanban-board">
+          <div class="kanban-col" data-status="todo">
+            <div class="col-head">
+              <span>📌 Bekleyen (Backlog)</span>
+              <span class="count-pill" id="count-todo">0</span>
+            </div>
+            <div class="col-dropzone" id="zone-todo"></div>
+          </div>
+
+          <div class="kanban-col" data-status="doing">
+            <div class="col-head">
+              <span>⚡ Aktif Odak (In Progress)</span>
+              <span class="count-pill active-pill" id="count-doing">0</span>
+            </div>
+            <div class="col-dropzone" id="zone-doing"></div>
+          </div>
+
+          <div class="kanban-col" data-status="done">
+            <div class="col-head">
+              <span>✅ Tamamlanan (Shipped)</span>
+              <span class="count-pill done-pill" id="count-done">0</span>
+            </div>
+            <div class="col-dropzone" id="zone-done"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODÜL 4: Özel Trigonometrik SVG Radar & Telemetri -->
+      <section class="bento-card radar-module">
+        <div class="card-header">
+          <h2>📐 Telemetri & Bilişsel Radar</h2>
+          <button id="export-telemetry" class="btn ghost small">📥 Rapor (.json)</button>
+        </div>
+
+        <div class="radar-container">
+          <svg id="radar-svg" viewBox="0 0 260 260" width="240" height="240"></svg>
+        </div>
+
+        <div class="telemetry-log" id="sys-log">
+          <!-- Sistem kayıtları buraya düşecek -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Ctrl+K Komut Paleti Modalı -->
+  <div id="cmd-modal" class="cmd-backdrop hidden">
+    <div class="cmd-palette">
+      <div class="cmd-search-bar">
+        <span>⌘</span>
+        <input type="text" id="cmd-input" placeholder="Komut ara veya çalıştır... (Örn: Ses, Pomodoro, Sıfırla)">
+        <kbd>ESC</kbd>
+      </div>
+      <ul id="cmd-list" class="cmd-list"></ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
